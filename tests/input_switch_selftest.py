@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Input-language switch self-test: Ctrl+Space and Alt+Space (Cmd+Space via xremap).
+"""Input-language switch self-test: Ctrl+Space and Super+Space (Cmd+Space opens Spotlight instead).
 
 Injects each combo into a focused GTK test window and checks that the active
 input source flips (and flips back on a second press, restoring your state).
@@ -12,7 +12,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, GLib, Gio
 
-COMBOS = [("Ctrl+Space", [K["CTRL"]]), ("Alt+Space (Cmd+Space)", [K["ALT"]]), ("Super+Space", [K["META"]])]
+COMBOS = [("Ctrl+Space", [K["CTRL"]]), ("Super+Space", [K["META"]])]
 res = {}
 
 

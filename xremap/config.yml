@@ -32,7 +32,7 @@ keymap:
       Super-Backspace: C-Backspace
 
       # --- Windows / system ---
-      Alt-Space: Super-Space           # Cmd+Space = switch input language
+      # Alt-Space (Cmd+Space) passes through: GNOME binds <Alt>space to the overview search (Spotlight)
       Alt-q: Alt-F4
       Alt-h: Super-h
       C-Alt-q: Super-l

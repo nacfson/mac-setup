@@ -57,7 +57,8 @@ Dependencies installed by `install.sh`:
 | Cmd+T / Cmd+Shift+T | New tab / reopen closed tab | New tab (Ctrl+Shift+T) |
 | Cmd+W | Close tab | Close tab (Ctrl+Shift+W) |
 | Cmd+C / V / X / A | Copy / paste / cut / select all | (not yet terminal-adjusted) |
-| Cmd+Space or Ctrl+Space | Switch input language | same |
+| Cmd+Space | Spotlight: open overview search (type to search apps/files) | same |
+| Ctrl+Space or Option+Space | Switch input language | same |
 | Cmd+Q | Quit (Alt+F4) | same |
 | Cmd+H | Hide (minimize) | same |
 | Ctrl+Cmd+Q | Lock screen | same |
@@ -77,7 +78,8 @@ The tests create a virtual keyboard, send real key presses through the running x
 python3 tests/xremap_selftest.py                    # GTK text fields
 python3 tests/term_selftest.py org.gnome.Ptyxis bksp  # terminal (same widget as Ptyxis); modes: bksp, left, superbksp, t, w
 python3 tests/brave_selftest.py t                   # isolated throwaway Brave profile; modes: t, w
-python3 tests/input_switch_selftest.py              # Ctrl/Alt/Super+Space switch language and back
+python3 tests/input_switch_selftest.py              # Ctrl/Super+Space switch language and back
+python3 tests/spotlight_selftest.py                 # Alt+Space (Cmd+Space) opens and closes the overview search
 ```
 
 They need your user in the `input` group (done by `install.sh`).
