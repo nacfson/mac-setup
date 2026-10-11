@@ -11,6 +11,10 @@ switch-to-application-7=['<Super>7']
 switch-to-application-8=['<Super>8']
 switch-to-application-9=['<Super>9']
 
+[org/gnome/desktop/wm/keybindings]
+switch-input-source=['<Super>space', '<Control>space', 'XF86Keyboard']
+switch-input-source-backward=['<Shift><Super>space', '<Shift><Control>space', '<Shift>XF86Keyboard']
+
 [org/gnome/desktop/input-sources]
 sources=[('xkb', 'us'), ('ibus', 'hangul')]
 xkb-options=['korean:ralt_hangul', 'korean:rctrl_hanja']

@@ -57,7 +57,7 @@ Dependencies installed by `install.sh`:
 | Cmd+T / Cmd+Shift+T | New tab / reopen closed tab | New tab (Ctrl+Shift+T) |
 | Cmd+W | Close tab | Close tab (Ctrl+Shift+W) |
 | Cmd+C / V / X / A | Copy / paste / cut / select all | (not yet terminal-adjusted) |
-| Cmd+Space | Switch input language | same |
+| Cmd+Space or Ctrl+Space | Switch input language | same |
 | Cmd+Q | Quit (Alt+F4) | same |
 | Cmd+H | Hide (minimize) | same |
 | Ctrl+Cmd+Q | Lock screen | same |
