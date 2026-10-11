@@ -77,6 +77,7 @@ The tests create a virtual keyboard, send real key presses through the running x
 python3 tests/xremap_selftest.py                    # GTK text fields
 python3 tests/term_selftest.py org.gnome.Ptyxis bksp  # terminal (same widget as Ptyxis); modes: bksp, left, superbksp, t, w
 python3 tests/brave_selftest.py t                   # isolated throwaway Brave profile; modes: t, w
+python3 tests/input_switch_selftest.py              # Ctrl/Alt/Super+Space switch language and back
 ```
 
 They need your user in the `input` group (done by `install.sh`).
