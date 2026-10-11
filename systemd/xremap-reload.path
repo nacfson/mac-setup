@@ -1,0 +1,10 @@
+[Unit]
+Description=Restart xremap when its config changes
+
+[Path]
+# Watches the directory too, so editors that save via rename (vim, sed -i, GNOME Text Editor) are caught.
+PathChanged=%h/.config/xremap/config.yml
+Unit=xremap-reload.service
+
+[Install]
+WantedBy=graphical-session.target

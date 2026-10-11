@@ -1,0 +1,7 @@
+[Unit]
+Description=Validate xremap config and restart xremap
+
+[Service]
+Type=oneshot
+# Only restart if the new config is valid, so a typo never leaves you without shortcuts.
+ExecStart=/bin/sh -c '%h/.local/bin/xremap --validate-config %h/.config/xremap/config.yml && systemctl --user restart xremap.service || echo "xremap config INVALID - keeping previous config running" >&2'

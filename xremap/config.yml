@@ -1,0 +1,60 @@
+# macOS-style shortcuts, global and explicit.
+# Only the combos listed here are changed; everything else passes through.
+# PC Alt = Mac Cmd position, PC Super = Mac Option position.
+keymap:
+  # Terminals: Shift+Home doesn't select text there, so use readline's Ctrl+U.
+  # Must stay ABOVE mac-unified (first matching keymap wins).
+  - name: mac-terminal
+    application:
+      only: [org.gnome.Ptyxis, org.gnome.Console, org.gnome.Terminal, gnome-terminal-server, kitty, Alacritty, com.mitchellh.ghostty, org.wezfurlong.wezterm]
+    exact_match: true
+    remap:
+      Alt-Backspace: C-u                     # Cmd+Backspace = delete to line start
+      Alt-t: C-Shift-t                       # Cmd+T = new terminal tab
+      Alt-w: C-Shift-w                       # Cmd+W = close terminal tab
+      Super-Backspace: Alt-Backspace         # Option+Backspace = delete previous word
+
+  - name: mac-unified
+    exact_match: true
+    remap:
+      # --- Line navigation (Mac Cmd+arrows) ---
+      Alt-Left: Home
+      Alt-Right: End
+      Alt-Shift-Left: Shift-Home
+      Alt-Shift-Right: Shift-End
+      Alt-Backspace: [Shift-Home, Backspace]   # Cmd+Backspace = delete to line start
+
+      # --- Word navigation (Mac Option+arrows) ---
+      Super-Left: C-Left
+      Super-Right: C-Right
+      Super-Shift-Left: C-Shift-Left
+      Super-Shift-Right: C-Shift-Right
+      Super-Backspace: C-Backspace
+
+      # --- Windows / system ---
+      Alt-Space: Super-Space           # Cmd+Space = switch input language
+      Alt-q: Alt-F4
+      Alt-h: Super-h
+      C-Alt-q: Super-l
+      Alt-Shift-KEY_3: Shift-SysRq     # Print key = KEY_SYSRQ in evdev
+      Alt-Shift-KEY_4: SysRq
+      Alt-Shift-KEY_5: SysRq
+
+      # --- Tabs / history / zoom / location ---
+      Alt-t: C-t                       # Cmd+T = new tab
+      Alt-Shift-t: C-Shift-t           # Cmd+Shift+T = reopen closed tab
+      Alt-w: C-w                       # Cmd+W = close tab
+      Alt-Shift-LeftBrace: C-PageUp
+      Alt-Shift-RightBrace: C-PageDown
+      Alt-LeftBrace: Alt-Left
+      Alt-RightBrace: Alt-Right
+      Alt-Equal: C-Equal
+      Alt-Minus: C-Minus
+      Alt-KEY_0: C-KEY_0
+      Alt-l: C-l
+
+      # --- Clipboard ---
+      Alt-c: C-Insert
+      Alt-v: Shift-Insert
+      Alt-x: C-x
+      Alt-a: C-a

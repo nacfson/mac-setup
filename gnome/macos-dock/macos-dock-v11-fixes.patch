@@ -1,0 +1,148 @@
+diff -ru a/lib/dockManager.js b/lib/dockManager.js
+--- a/lib/dockManager.js	2026-10-07 06:12:13.000000000 +0900
++++ b/lib/dockManager.js	2026-10-11 11:51:21.721166064 +0900
+@@ -302,18 +302,13 @@
+             if (firstWindow.has_focus() && !firstWindow.minimized) {
+                 // Window is focused and visible — minimize it.
+                 firstWindow.minimize();
++            } else {
++                if (firstWindow.minimized) {
++                    firstWindow.unminimize();
++                }
++                Main.activateWindow(firstWindow);
+             }
+-            else if (firstWindow.minimized) {
+-                // Window is minimized — restore and activate.
+-                firstWindow.unminimize();
+-                firstWindow.activate(global.get_current_time());
+-            }
+-            else {
+-                // Window exists but not focused — activate it.
+-                firstWindow.activate(global.get_current_time());
+-            }
+-        }
+-        else {
++        } else {
+             app.open_new_window(-1);
+         }
+     }
+@@ -333,10 +328,16 @@
+         }
+     }
+     _findFirstWindow(app) {
++        try {
++            const appWindows = app.get_windows ? app.get_windows() : [];
++            if (appWindows && appWindows.length > 0) {
++                return appWindows[0];
++            }
++        } catch (e) {}
+         const tracker = Shell.WindowTracker.get_default();
+         const windows = global.get_window_actors();
+         for (const wa of windows) {
+-            const metaWin = wa.get_meta_window();
++            const metaWin = wa.meta_window ?? (typeof wa.get_meta_window === "function" ? wa.get_meta_window() : null);
+             if (!metaWin)
+                 continue;
+             if (tracker.get_window_app(metaWin) === app) {
+@@ -522,19 +523,20 @@
+         if (!this._settings.get_boolean("enable-keyboard-nav"))
+             return;
+         const settings = this._settings;
+-        Main.wm.addKeybinding("toggle-dock", settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL, () => this._toggleDockVisibility());
++        const mode = Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW;
++        Main.wm.addKeybinding("toggle-dock", settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, mode, () => this._toggleDockVisibility());
+         // Super+1 through Super+9, Super+0 for position 10
+         for (let i = 1; i <= 9; i++) {
+-            Main.wm.addKeybinding(`focus-app-${i}`, settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL, () => this._focusAppByIndex(i - 1));
++            Main.wm.addKeybinding(`focus-app-${i}`, settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, mode, () => this._focusAppByIndex(i - 1));
+         }
+-        Main.wm.addKeybinding("focus-app-10", settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL, () => this._focusAppByIndex(9));
++        Main.wm.addKeybinding("focus-app-10", settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, mode, () => this._focusAppByIndex(9));
+     }
+     _removeKeybindings() {
+-        Main.wm.removeKeybinding("toggle-dock");
++        try { Main.wm.removeKeybinding("toggle-dock"); } catch (e) {}
+         for (let i = 1; i <= 9; i++) {
+-            Main.wm.removeKeybinding(`focus-app-${i}`);
++            try { Main.wm.removeKeybinding(`focus-app-${i}`); } catch (e) {}
+         }
+-        Main.wm.removeKeybinding("focus-app-10");
++        try { Main.wm.removeKeybinding("focus-app-10"); } catch (e) {}
+     }
+     _toggleDockVisibility() {
+         if (!this._container)
+@@ -548,11 +550,11 @@
+     _focusAppByIndex(index) {
+         if (!this._iconManager)
+             return;
+-        const actors = this._iconManager.getIconActors();
+-        if (index >= actors.length)
++        const actors = this._iconManager.getIconActors().filter(a => a && a._appData);
++        if (index < 0 || index >= actors.length)
+             return;
+         const data = actors[index]._appData;
+-        if (!data)
++        if (!data || !data.appId)
+             return;
+         const appSystem = Shell.AppSystem.get_default();
+         const app = appSystem.lookup_app(data.appId);
+diff -ru a/lib/signalManager.js b/lib/signalManager.js
+--- a/lib/signalManager.js	2026-10-07 06:12:13.000000000 +0900
++++ b/lib/signalManager.js	2026-10-11 11:51:21.721793852 +0900
+@@ -11,7 +11,13 @@
+     }
+     disconnectAll() {
+         for (const conn of this._connections) {
+-            conn.source.disconnect(conn.signalId);
++            try {
++                if (conn.source && typeof conn.source.disconnect === "function") {
++                    conn.source.disconnect(conn.signalId);
++                }
++            } catch (e) {
++                // Ignore if already disposed
++            }
+         }
+         this._connections = [];
+     }
+diff -ru a/lib/windowPreview.js b/lib/windowPreview.js
+--- a/lib/windowPreview.js	2026-10-07 06:12:13.000000000 +0900
++++ b/lib/windowPreview.js	2026-10-11 11:51:21.721382643 +0900
+@@ -141,11 +141,11 @@
+         });
+         this._popup.add_child(grid);
+         // Keep popup open when mouse is over it
+-        this._signals.connect(this._popup, "enter-event", () => {
++        this._popup.connect("enter-event", () => {
+             this.cancelScheduledHide();
+             return Clutter.EVENT_PROPAGATE;
+         });
+-        this._signals.connect(this._popup, "leave-event", () => {
++        this._popup.connect("leave-event", () => {
+             this.scheduleHide();
+             return Clutter.EVENT_PROPAGATE;
+         });
+@@ -215,13 +215,13 @@
+         closeBtn.connect("button-press-event", () => Clutter.EVENT_STOP);
+         thumbBox.add_child(closeBtn);
+         // Click to focus this window
+-        this._signals.connect(thumbBox, "button-press-event", (_actor, event) => {
++        thumbBox.connect("button-press-event", (_actor, event) => {
+             const button = event.get_button();
+             if (button === 1) {
+                 if (metaWin.minimized) {
+                     metaWin.unminimize();
+                 }
+-                metaWin.activate(global.get_current_time());
++                Main.activateWindow(metaWin);
+                 this.hide();
+             }
+             return Clutter.EVENT_STOP;
+@@ -352,7 +352,6 @@
+         }
+         this._thumbs = [];
+         if (this._popup) {
+-            this._signals.disconnectAll();
+             Main.layoutManager.removeChrome(this._popup);
+             this._popup.destroy();
+             this._popup = null;
+Only in a: schemas
